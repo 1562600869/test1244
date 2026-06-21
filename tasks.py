@@ -6,9 +6,6 @@ from storage import load_data, save_data
 
 
 def add_edit_task(client, desc, hours, rate):
-    hours = float(hours)
-    rate = float(rate)
-
     if hours <= 0:
         raise ValueError("工时必须为正数")
     if rate <= 0:

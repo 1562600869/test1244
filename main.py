@@ -14,6 +14,7 @@ def main():
     add_studio_parser.add_argument("studio_id", help="棚编号，如 S01")
     add_studio_parser.add_argument("name", help="棚名称，如 A棚")
     add_studio_parser.add_argument("--type", required=True, dest="studio_type",
+                                   choices=STUDIO_TYPES,
                                    help=f"棚类型: {', '.join(STUDIO_TYPES)}")
     add_studio_parser.add_argument("--hourly-rate", required=True, type=int,
                                    help="每小时费用（整数）")

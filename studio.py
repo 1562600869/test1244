@@ -29,12 +29,7 @@ def add_studio(studio_id, name, studio_type, hourly_rate):
 
 
 def _parse_time(time_str):
-    return datetime.strptime(time_str, "%H:%M")
-
-
-def _time_to_minutes(time_str):
-    t = _parse_time(time_str)
-    return t.hour * 60 + t.minute
+    return datetime.strptime(time_str, "%H:%M").time()
 
 
 def _check_overlap(start1, end1, start2, end2):
@@ -50,20 +45,22 @@ def book_studio(studio_id, client, phone, date, start, end):
     if not client:
         raise ValueError("客户名称不能为空")
 
-    start_min = _time_to_minutes(start)
-    end_min = _time_to_minutes(end)
+    start_time = _parse_time(start)
+    end_time = _parse_time(end)
 
-    if end_min <= start_min:
+    if end_time <= start_time:
         raise ValueError("结束时间必须晚于开始时间")
 
     for booking_id, booking in data["bookings"].items():
         if booking["studio_id"] == studio_id and booking["date"] == date and booking["status"] == "active":
-            b_start = _time_to_minutes(booking["start"])
-            b_end = _time_to_minutes(booking["end"])
-            if _check_overlap(start_min, end_min, b_start, b_end):
+            b_start = _parse_time(booking["start"])
+            b_end = _parse_time(booking["end"])
+            if _check_overlap(start_time, end_time, b_start, b_end):
                 raise ValueError(f"该时段与预约 {booking_id} 冲突 ({booking['start']}-{booking['end']})")
 
-    hours = (end_min - start_min) / 60.0
+    start_dt = datetime.strptime(start, "%H:%M")
+    end_dt = datetime.strptime(end, "%H:%M")
+    hours = (end_dt - start_dt).total_seconds() / 3600.0
     hourly_rate = data["studios"][studio_id]["hourly_rate"]
     total_fee = math.ceil(hours * hourly_rate)
 
